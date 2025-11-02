@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: fintech_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: dentamuhajir
+      POSTGRES_PASSWORD: 5MbVqyTEZ42wFS4as9iwZ7
+      POSTGRES_DB: fintechdb
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - fintech_network
+volumes:
+  postgres_data:
+
+networks:
+  fintech_network:
