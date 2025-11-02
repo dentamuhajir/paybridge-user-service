@@ -1,3 +1,18 @@
 spring:
-  application:
-    name: fintech
+  datasource:
+    url: jdbc:postgresql://localhost:5433/fintechdb
+    username: dentamuhajir
+    password: 5MbVqyTEZ42wFS4as9iwZ7
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 8080
