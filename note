@@ -1,0 +1,20 @@
+Setup spring
+    https://start.spring.io/
+    https://start.spring.io/#!type=maven-project&language=java&platformVersion=3.5.7&packaging=jar&configurationFileFormat=yaml&jvmVersion=21&groupId=com.fintech&artifactId=platform&name=fintech&description=Digital%20Wallet%20%26%20Payment%20Platform%20Backend&packageName=com.fintech.platform&dependencies=
+
+
+Docker
+    Start docker desktop
+    maybe you want to delete volume because it's not overwrite
+    docker-compose down -v
+
+    docker-compose up -d
+
+    verify it's running
+        docker ps
+
+    error
+    FATAL: password authentication failed for user "
+    https://stackoverflow.com/questions/58562024/docker-password-authentication-failed-for-user-postgres
+
+
