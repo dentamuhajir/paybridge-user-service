@@ -1,4 +1,17 @@
 services:
+  app:
+    build: .
+    container_name: fintech-platform
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fintechdb
+      SPRING_DATASOURCE_USERNAME: dentamuhajir
+      SPRING_DATASOURCE_PASSWORD: 5MbVqyTEZ42wFS4as9iwZ7
+    networks:
+      - fintech_network
   postgres:
     image: postgres:16
     container_name: fintech_postgres
