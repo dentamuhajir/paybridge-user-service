@@ -1,24 +1,23 @@
-# Stage 1: Build the JAR file using Maven
-FROM maven:3.9.6-eclipse-temurin-21 AS builder
+# Development Dockerfile with live reload support
+FROM eclipse-temurin:21-jdk-alpine
+
+# Install Maven
+RUN apk add --no-cache maven
+
 WORKDIR /app
 
-# Copy pom.xml and download dependencies
+# Copy pom.xml first and download dependencies
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
-# Copy source code and build the project
-COPY src ./src
-RUN mvn clean package -DskipTests
+# Don't copy src — we mount it live in docker-compose)
+# COPY src ./src
 
-# Stage 2: Create the lightweight runtime image
-FROM eclipse-temurin:21-jdk-alpine
-WORKDIR /app
+# Enable Spring DevTools restart
+ENV SPRING_DEVTOOLS_RESTART_ENABLED=true
 
-# Copy built jar from builder stage
-COPY --from=builder /app/target/*.jar app.jar
-
-# Expose the application port
+# Expose the app port
 EXPOSE 8080
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run the app using Maven
+CMD ["mvn", "spring-boot:run"]

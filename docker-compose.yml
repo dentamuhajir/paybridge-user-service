@@ -1,17 +1,25 @@
+version: "3.9"
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: fintech-platform
     ports:
       - "8080:8080"
-    depends_on:
-      - postgres
+    volumes:
+      - .:/app           # mount your source code for live reload
+      - ~/.m2:/root/.m2  # cache Maven dependencies
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fintechdb
       SPRING_DATASOURCE_USERNAME: dentamuhajir
       SPRING_DATASOURCE_PASSWORD: 5MbVqyTEZ42wFS4as9iwZ7
+      SPRING_DEVTOOLS_RESTART_ENABLED: "true"
+    depends_on:
+      - postgres
     networks:
       - fintech_network
+
   postgres:
     image: postgres:16
     container_name: fintech_postgres
@@ -26,6 +34,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - fintech_network
+
 volumes:
   postgres_data:
 
