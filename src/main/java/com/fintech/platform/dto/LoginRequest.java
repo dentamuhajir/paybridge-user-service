@@ -3,8 +3,7 @@ package com.fintech.platform.dto;
 import lombok.Data;
 
 @Data
-public class RegisterRequest {
+public class LoginRequest {
     private String email;
     private String password;
-
 }

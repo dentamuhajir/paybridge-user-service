@@ -1,5 +1,6 @@
 package com.fintech.platform.service.impl;
 
+import com.fintech.platform.dto.LoginRequest;
 import com.fintech.platform.dto.RegisterRequest;
 import com.fintech.platform.entity.User;
 import com.fintech.platform.repository.AuthRepository;
@@ -25,5 +26,17 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(encodedPassword);
         authRepository.save(user);
         return "email is registered";
+    }
+
+    public Boolean login(LoginRequest request) {
+        User user = authRepository.findByEmail(request.getEmail());
+        if(user == null) {
+            System.out.println("error here");
+            return  false;
+        }
+
+        boolean verify = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        System.out.println(verify);
+        return verify;
     }
 }
