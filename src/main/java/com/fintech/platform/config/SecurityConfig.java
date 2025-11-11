@@ -20,7 +20,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // disable CSRF for API usage
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll() // allow all requests for now
-                );
+                )
+                .formLogin(form -> form.disable()) // disable default login form
+                .httpBasic(basic -> basic.disable()); // disable basic auth popup
         return http.build();
     }
 }
