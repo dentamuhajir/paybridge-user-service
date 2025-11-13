@@ -19,7 +19,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> Register(@RequestBody RegisterRequest request) {
         ApiResponse resp = authService.register(request);
-        return ResponseEntity.ok(resp);
+        return ResponseEntity.status(resp.getStatus()).body(resp);
     }
 
     @GetMapping("/login")

@@ -18,23 +18,17 @@ public class AuthServiceImpl implements AuthService {
     private PasswordEncoder passwordEncoder;
     public ApiResponse register(RegisterRequest request){
         if(authRepository.existsByEmail(request.getEmail())) {
-            return ApiResponse.builder()
-                    .status(401)
-                    .message("Email has already registered")
-                    .success(false)
-                    .build();
+            return ApiResponse.error("Email has already registered", 409);
         }
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
+
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(encodedPassword);
         authRepository.save(user);
-        return ApiResponse.builder()
-                .status(200)
-                .message("Email registered successfully")
-                .success(true)
-                .build();
+
+        return ApiResponse.success("Email registered successfully",null);
     }
 
     public Boolean login(LoginRequest request) {
