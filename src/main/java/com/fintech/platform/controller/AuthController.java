@@ -1,5 +1,6 @@
 package com.fintech.platform.controller;
 
+import com.fintech.platform.common.response.ApiResponse;
 import com.fintech.platform.dto.LoginRequest;
 import com.fintech.platform.dto.RegisterRequest;
 import com.fintech.platform.service.AuthService;
@@ -17,7 +18,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> Register(@RequestBody RegisterRequest request) {
-        String resp = authService.register(request);
+        ApiResponse resp = authService.register(request);
         return ResponseEntity.ok(resp);
     }
 

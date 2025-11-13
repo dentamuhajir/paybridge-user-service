@@ -1,5 +1,6 @@
 package com.fintech.platform.service.impl;
 
+import com.fintech.platform.common.response.ApiResponse;
 import com.fintech.platform.dto.LoginRequest;
 import com.fintech.platform.dto.RegisterRequest;
 import com.fintech.platform.entity.User;
@@ -15,9 +16,13 @@ public class AuthServiceImpl implements AuthService {
     private AuthRepository authRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    public String register(RegisterRequest request){
+    public ApiResponse register(RegisterRequest request){
         if(authRepository.existsByEmail(request.getEmail())) {
-            return "email has already registered";
+            return ApiResponse.builder()
+                    .status(401)
+                    .message("Email has already registered")
+                    .success(false)
+                    .build();
         }
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
@@ -25,7 +30,11 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(request.getEmail());
         user.setPassword(encodedPassword);
         authRepository.save(user);
-        return "email is registered";
+        return ApiResponse.builder()
+                .status(200)
+                .message("Email registered successfully")
+                .success(true)
+                .build();
     }
 
     public Boolean login(LoginRequest request) {
