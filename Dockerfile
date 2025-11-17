@@ -1,23 +1,46 @@
-# Development Dockerfile with live reload support
-FROM eclipse-temurin:21-jdk-alpine
+# ---- Stage 1: Build ----
+FROM eclipse-temurin:21-jdk-alpine AS builder
 
-# Install Maven
+WORKDIR /build
+
+COPY pom.xml .
 RUN apk add --no-cache maven
+RUN mvn dependency:go-offline -B
+
+COPY src ./src
+
+RUN mvn clean package -DskipTests
+
+# ---- Stage 2: Runtime ----
+FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
-# Copy pom.xml first and download dependencies
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
+COPY --from=builder /build/target/*.jar app.jar
 
-# Don't copy src — we mount it live in docker-compose)
-# COPY src ./src
-
-# Enable Spring DevTools restart
-ENV SPRING_DEVTOOLS_RESTART_ENABLED=true
-
-# Expose the app port
 EXPOSE 8080
 
-# Run the app using Maven
-CMD ["mvn", "spring-boot:run"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
+# ---- Stage 1: Build ----
+FROM eclipse-temurin:21-jdk-alpine AS builder
+
+WORKDIR /build
+
+COPY pom.xml .
+RUN apk add --no-cache maven
+RUN mvn dependency:go-offline -B
+
+COPY src ./src
+
+RUN mvn clean package -DskipTests
+
+# ---- Stage 2: Runtime ----
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+COPY --from=builder /build/target/*.jar app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
