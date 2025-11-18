@@ -4,7 +4,7 @@ import com.fintech.platform.common.response.ApiResponse;
 import com.fintech.platform.dto.LoginRequest;
 import com.fintech.platform.dto.RegisterRequest;
 import com.fintech.platform.entity.User;
-import com.fintech.platform.repository.AuthRepository;
+import com.fintech.platform.repository.UserRepository;
 import com.fintech.platform.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthServiceImpl implements AuthService {
     @Autowired
-    private AuthRepository authRepository;
+    private UserRepository authRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
     public ApiResponse register(RegisterRequest request){
