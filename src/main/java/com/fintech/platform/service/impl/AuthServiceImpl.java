@@ -1,14 +1,18 @@
 package com.fintech.platform.service.impl;
 
 import com.fintech.platform.common.response.ApiResponse;
+import com.fintech.platform.dto.AuthResponse;
 import com.fintech.platform.dto.LoginRequest;
 import com.fintech.platform.dto.RegisterRequest;
 import com.fintech.platform.entity.Role;
 import com.fintech.platform.entity.User;
 import com.fintech.platform.repository.RoleRepository;
 import com.fintech.platform.repository.UserRepository;
+import com.fintech.platform.security.AppUserDetailsService;
+import com.fintech.platform.security.JwtService;
 import com.fintech.platform.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +24,11 @@ public class AuthServiceImpl implements AuthService {
     private RoleRepository roleRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private AppUserDetailsService userDetailsService;
+    @Autowired
+    private JwtService jwtService;
+
     public ApiResponse register(RegisterRequest request){
         if(userRepository.existsByEmail(request.getEmail())) {
             return ApiResponse.error("Email has already registered", 409);
@@ -38,15 +47,19 @@ public class AuthServiceImpl implements AuthService {
         return ApiResponse.success("Email registered successfully",null);
     }
 
-    public Boolean login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail());
-        if(user == null) {
-            System.out.println("error here");
-            return  false;
+    public ApiResponse login(LoginRequest request) {
+        UserDetails userDetails =
+                userDetailsService.loadUserByUsername(request.getEmail());
+
+        if (!passwordEncoder.matches(request.getPassword(), userDetails.getPassword())) {
+            throw new RuntimeException("Invalid credentials");
         }
 
-        boolean verify = passwordEncoder.matches(request.getPassword(), user.getPassword());
-        System.out.println(verify);
-        return verify;
+        String token = jwtService.generateToken(userDetails);
+        AuthResponse authResponse = AuthResponse.builder()
+                .token(token)
+                .build();
+
+        return ApiResponse.success("Token generated", authResponse);
     }
 }

@@ -6,5 +6,5 @@ import com.fintech.platform.dto.RegisterRequest;
 
 public interface AuthService {
     public ApiResponse register(RegisterRequest request);
-    public Boolean login(LoginRequest request);
+    public ApiResponse login(LoginRequest request);
 }

@@ -27,14 +27,9 @@ public class AuthController {
         return ResponseEntity.status(resp.getStatus()).body(resp);
     }
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        Boolean verify = authService.login(request);
-        if(verify == false) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Login is failed");
-        }
-        return ResponseEntity.ok("Login is success");
+        ApiResponse resp = authService.login(request);
+        return ResponseEntity.status(resp.getStatus()).body(resp);
     }
 }
