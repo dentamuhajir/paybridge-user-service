@@ -19,7 +19,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // disable CSRF for API usage
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // allow all requests for now
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/health").permitAll()
+                        .requestMatchers("/users/**").authenticated()
                 )
                 .formLogin(form -> form.disable()) // disable default login form
                 .httpBasic(basic -> basic.disable()); // disable basic auth popup
