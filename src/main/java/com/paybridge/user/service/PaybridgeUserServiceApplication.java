@@ -4,10 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class FintechApplication {
+public class PaybridgeUserServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(FintechApplication.class, args);
+		SpringApplication.run(PaybridgeUserServiceApplication.class, args);
 	}
-
 }
