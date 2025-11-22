@@ -4,39 +4,39 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    container_name: fintech-platform
+    container_name: paybridge-user-svc
     ports:
       - "8080:8080"
     volumes:
       - .:/app           # mount your source code for live reload
       - ~/.m2:/root/.m2  # cache Maven dependencies
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fintechdb
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/paybridge_user
       SPRING_DATASOURCE_USERNAME: dentamuhajir
       SPRING_DATASOURCE_PASSWORD: 5MbVqyTEZ42wFS4as9iwZ7
       SPRING_DEVTOOLS_RESTART_ENABLED: "true"
     depends_on:
       - postgres
     networks:
-      - fintech_network
+      - paybridge_network
 
   postgres:
     image: postgres:16
-    container_name: fintech_postgres
+    container_name: paybridge-user-db
     restart: always
     environment:
       POSTGRES_USER: dentamuhajir
       POSTGRES_PASSWORD: 5MbVqyTEZ42wFS4as9iwZ7
-      POSTGRES_DB: fintechdb
+      POSTGRES_DB: paybridge_user
     ports:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - fintech_network
+      - paybridge_network
 
 volumes:
   postgres_data:
 
 networks:
-  fintech_network:
+  paybridge_network:
