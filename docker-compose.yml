@@ -16,6 +16,9 @@ services:
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       SPRING_DEVTOOLS_RESTART_ENABLED: "true"
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
       - postgres
     networks:
@@ -47,7 +50,6 @@ services:
       - redis_data:/data
     networks:
       - paybridge_network
-
 
 volumes:
   postgres_data:
