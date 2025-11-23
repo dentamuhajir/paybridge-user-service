@@ -1,4 +1,4 @@
-# PayBridge - E-Wallet Platform (Backend)
+# Paybridge User Service
 
-PayBridge is a Java-based e-wallet backend service built using Spring Boot.  
-It provides core wallet functionality such as user registration, balance management, fund transfers, and transaction history.
+A simple Java Spring Boot–based user management microservice for an e-wallet platform.
+Handles user registration, login, authentication, and secure profile management.
