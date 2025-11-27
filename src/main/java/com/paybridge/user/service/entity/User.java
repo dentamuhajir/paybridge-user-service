@@ -13,11 +13,17 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, name = "full_name")
+    private String fullName;
+
     @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false, unique = true, name = "phone_number")
+    private String phoneNumber;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
