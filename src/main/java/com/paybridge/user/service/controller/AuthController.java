@@ -4,9 +4,11 @@ import com.paybridge.user.service.common.response.ApiResponse;
 import com.paybridge.user.service.dto.LoginRequest;
 import com.paybridge.user.service.dto.RegisterRequest;
 import com.paybridge.user.service.service.AuthService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +20,7 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         logger.info("Received register request for email: {}", request.getEmail());
         ApiResponse resp = authService.register(request);
         logger.info("Register result: status={}, success={}", resp.getStatus(), resp.isSuccess());
