@@ -7,12 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.util.Map;
 
 @RestController
+@RequestMapping("/api/v1/health")
 public class HealthController {
 
     private static final Logger logger = LoggerFactory.getLogger(HealthController.class);
@@ -23,30 +26,39 @@ public class HealthController {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-    @GetMapping("/health")
-    public ResponseEntity<?> healthCheck() {
-        logger.info("Health check: checking DB & Redis...");
+    @GetMapping
+    public ResponseEntity<?> health() {
+        ApiResponse checkDatabase = checkDatabase();
+        ApiResponse checkRedis = checkRedis();
 
-        // =======================
-        // 1. Check Database
-        // =======================
+        return ResponseEntity.status(200).body(
+                ApiResponse.success("Health check completed",
+                    Map.of(
+                            "database", checkDatabase,
+                            "redis",checkRedis
+                    )
+                )
+        );
+    }
+
+    private ApiResponse checkDatabase() {
+        logger.info("Health check: checking Database...");
         try (Connection conn = dataSource.getConnection()) {
             if (!conn.isValid(5)) {
                 logger.error("Database connection FAILED");
-                return ResponseEntity.status(500).body(
-                        ApiResponse.error("Database connection failed", 500)
-                );
+                return ApiResponse.error("Database connection failed", 500);
             }
         } catch (Exception e) {
             logger.error("Database health check error: {}", e.getMessage(), e);
-            return ResponseEntity.status(500).body(
-                    ApiResponse.error("Database error: " + e.getMessage(), 500)
-            );
+            return ApiResponse.error("Database error: " + e.getMessage(), 500);
         }
 
-        // =======================
-        // 2. Check Redis
-        // =======================
+        logger.info("Health check passed: Database OK");
+        return ApiResponse.success("Database connection is healthy!", null);
+    }
+
+    private ApiResponse checkRedis() {
+        logger.info("Health check: checking Redis...");
         try {
             String pong = redisTemplate.getConnectionFactory()
                     .getConnection()
@@ -54,24 +66,15 @@ public class HealthController {
 
             if (!"PONG".equalsIgnoreCase(pong)) {
                 logger.error("Redis PING returned: {}", pong);
-                return ResponseEntity.status(500).body(
-                        ApiResponse.error("Redis connection failed", 500)
-                );
+                return ApiResponse.error("Redis connection failed", 500);
             }
 
         } catch (Exception e) {
             logger.error("Redis health check error: {}", e.getMessage(), e);
-            return ResponseEntity.status(500).body(
-                    ApiResponse.error("Redis error: " + e.getMessage(), 500)
-            );
+            return ApiResponse.error("Redis error: " + e.getMessage(), 500);
         }
 
-        // =======================
-        // SUCCESS
-        // =======================
-        logger.info("Health check passed: DB and Redis OK");
-        return ResponseEntity.ok(
-                ApiResponse.success("DB and Redis connection are healthy!", null)
-        );
+        logger.info("Health check passed: Redis OK");
+        return ApiResponse.success("Redis connection is healthy!", null);
     }
 }
