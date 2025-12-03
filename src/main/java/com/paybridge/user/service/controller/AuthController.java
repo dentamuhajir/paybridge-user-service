@@ -5,25 +5,23 @@ import com.paybridge.user.service.dto.LoginRequest;
 import com.paybridge.user.service.dto.RegisterRequest;
 import com.paybridge.user.service.service.AuthService;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@Slf4j
 public class AuthController {
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     @Autowired
     private AuthService authService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
-        logger.info("Received register request for email: {}", request.getEmail());
+        log.info("Incoming request: Register user email={}", request.getEmail());
         ApiResponse resp = authService.register(request);
-        logger.info("Register result: status={}, success={}", resp.getStatus(), resp.isSuccess());
+        log.info("Registration completed for email={} status={}", request.getEmail(), resp.getStatus());
         return ResponseEntity.status(resp.getStatus()).body(resp);
     }
 

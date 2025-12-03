@@ -36,7 +36,10 @@ public class AuthServiceImpl implements AuthService {
     private WalletClient walletClient;
 
     public ApiResponse register(RegisterRequest request){
+        log.info("Start registration flow email={}", request.getEmail());
+
         if(userRepository.existsByEmail(request.getEmail())) {
+            log.warn("Registration rejected: email already exists email={}", request.getEmail());
             return ApiResponse.error("Email has already registered", 409);
         }
 
@@ -51,22 +54,29 @@ public class AuthServiceImpl implements AuthService {
         user.setPhoneNumber(request.getPhoneNumber());
         user.setRole(userRole);
         userRepository.save(user);
+        log.info("User saved with id={} email={}", user.getId(), user.getEmail());
 
         // Resilient wallet creation (post-tx, fire-and-forget)
         createWalletForUser(user.getId().toString());
+
+        log.info("Registration success email={} user_id={}",
+                request.getEmail(), user.getId());
 
         return ApiResponse.success("Email registered successfully",null);
     }
 
     private void createWalletForUser(String userId) {
+        log.info("Initiating wallet creation user_id={}", userId);
+
         try {
             WalletCreateRequest walletReq = new WalletCreateRequest();
             walletReq.setUserId(userId);
             walletReq.setCurrency("IDR");
             walletClient.createWallet(walletReq);
-            log.info("Wallet creation initiated for user: {}", userId);
+
+            log.info("Wallet creation request sent user_id={}", userId);
         } catch (Exception e) {
-            log.error("Wallet creation failed for user {}: {}", userId, e.getMessage(), e);
+            log.error("Wallet creation failed user_id={} error={}", userId, e.getMessage(), e);
             // Optional: Emit event for retry/notify (e.g., via Spring Events or Kafka)
             // Don't rethrow—registration succeeds
         }
