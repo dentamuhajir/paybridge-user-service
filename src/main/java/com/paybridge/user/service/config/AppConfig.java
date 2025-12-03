@@ -1,13 +1,16 @@
 package com.paybridge.user.service.config;
 
+import com.paybridge.user.service.logging.TraceRestTemplateInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class AppConfig {
-    @Bean  // Registers RestTemplate as a Spring bean (singleton by default)
+    @Bean
     public RestTemplate restTemplate() {
-        return new RestTemplate();  // Basic instance—customize if needed (e.g., timeouts)
+        RestTemplate rt = new RestTemplate();
+        rt.getInterceptors().add(new TraceRestTemplateInterceptor());
+        return rt;
     }
 }
