@@ -2,6 +2,7 @@ package com.paybridge.user.service.client;
 
 import com.paybridge.user.service.dto.WalletCreateRequest;  // Assume this DTO exists
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -33,6 +34,8 @@ public class WalletClient {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + transactionToken);
             headers.setContentType(MediaType.APPLICATION_JSON);
+            String traceId = MDC.get("trace_id");
+            if (traceId != null) headers.set("X-Trace-Id", traceId);
             HttpEntity<WalletCreateRequest> entity = new HttpEntity<>(request, headers);
 
             restTemplate.postForObject(walletEndpoint , entity, Void.class);
