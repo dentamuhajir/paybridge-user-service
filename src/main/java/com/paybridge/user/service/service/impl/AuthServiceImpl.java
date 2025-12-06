@@ -8,6 +8,7 @@ import com.paybridge.user.service.dto.RegisterRequest;
 import com.paybridge.user.service.dto.WalletCreateRequest;
 import com.paybridge.user.service.entity.Role;
 import com.paybridge.user.service.entity.User;
+import com.paybridge.user.service.logging.LogUtil;
 import com.paybridge.user.service.repository.RoleRepository;
 import com.paybridge.user.service.repository.UserRepository;
 import com.paybridge.user.service.security.AppUserDetailsService;
@@ -39,7 +40,13 @@ public class AuthServiceImpl implements AuthService {
         log.info("Start registration flow email={}", request.getEmail());
 
         if(userRepository.existsByEmail(request.getEmail())) {
-            log.warn("Registration rejected: email already exists email={}", request.getEmail());
+            LogUtil.error(
+                    "Registration rejected: email already exists email=" + request.getEmail(),
+                    "/users/register",
+                    "POST",
+                    409,
+                    null
+            );
             return ApiResponse.error("Email has already registered", 409);
         }
 
