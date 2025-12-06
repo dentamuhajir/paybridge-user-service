@@ -13,27 +13,41 @@ import java.util.UUID;
 public class LoggingFilter implements Filter {
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
 
+        HttpServletRequest request = (HttpServletRequest) req;
+        HttpServletResponse response = (HttpServletResponse) res;
+
         long start = System.currentTimeMillis();
-        HttpServletRequest req = (HttpServletRequest) request;
 
-        String traceId = req.getHeader("X-Trace-Id");
-        if (traceId == null) traceId = UUID.randomUUID().toString();
-        String spanId = UUID.randomUUID().toString();
+        // Generate or read trace_id
+        String traceId = request.getHeader("X-Trace-Id");
+        if (traceId == null || traceId.isEmpty()) {
+            traceId = UUID.randomUUID().toString();
+        }
 
+        // Put MDC defaults
         MDC.put("trace_id", traceId);
-        MDC.put("span_id", spanId);
-        MDC.put("method", req.getMethod());
-        MDC.put("endpoint", req.getRequestURI());
+        MDC.put("span_id", UUID.randomUUID().toString());
+        MDC.put("method", request.getMethod());
+        MDC.put("endpoint", request.getRequestURI());
 
-        chain.doFilter(request, response);
+        try {
+            chain.doFilter(request, response);
+        } finally {
+            long duration = System.currentTimeMillis() - start;
 
-        long duration = System.currentTimeMillis() - start;
-        int status = ((HttpServletResponse) response).getStatus();
+            // Attach status & duration
+            MDC.put("status", String.valueOf(response.getStatus()));
+            MDC.put("duration_ms", String.valueOf(duration));
 
-        MDC.put("status", String.valueOf(status));
-        MDC.put("duration_ms", String.valueOf(duration));
+            // Force a log line AFTER request finishes
+            // (So every request has a summary log)
+            org.slf4j.LoggerFactory.getLogger("HTTP_LOG")
+                    .info("HTTP request completed");
+
+            MDC.clear();
+        }
     }
 }
