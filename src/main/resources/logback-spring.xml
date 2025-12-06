@@ -1,20 +1,24 @@
- <configuration>
-
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+<configuration>
+    <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-            <includeMdc>true</includeMdc>
-            <customFields>
-                {"service":"user-service"}
-            </customFields>
+            <includeMdcKeyName>trace_id</includeMdcKeyName>
+            <includeMdcKeyName>span_id</includeMdcKeyName>
+            <includeMdcKeyName>service</includeMdcKeyName>
+            <includeMdcKeyName>method</includeMdcKeyName>
+            <includeMdcKeyName>endpoint</includeMdcKeyName>
+            <includeMdcKeyName>status</includeMdcKeyName>
+            <includeMdcKeyName>duration_ms</includeMdcKeyName>
         </encoder>
     </appender>
 
-    <logger name="SERVICE_LOG" level="INFO" additivity="false">
-        <appender-ref ref="STDOUT"/>
-    </logger>
+    <property name="service.name" value="user-service"/>
+
+    <turboFilter class="ch.qos.logback.classic.turbo.MDCFilter">
+        <MDCKey>service</MDCKey>
+        <Value>${service.name}</Value>
+    </turboFilter>
 
     <root level="INFO">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="JSON"/>
     </root>
-
 </configuration>
